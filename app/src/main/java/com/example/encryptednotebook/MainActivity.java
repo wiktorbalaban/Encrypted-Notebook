@@ -18,6 +18,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int SET_PASSWORD_REQUEST = 1;
@@ -30,8 +33,22 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         TextView hello = findViewById(R.id.hello);
         hello.setText("Wpisz hasło");
+
+        String saltString = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("SALT", null);
+        if (saltString == null) {
+            String randomString = new BigInteger(130, new SecureRandom()).toString(32);
+            byte[] salt = new byte[8];
+            try {
+                System.arraycopy(randomString.getBytes("UTF-8"), 0, salt, 0, 8);
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("SALT", new String(salt)).apply();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
         boolean isPassCreated = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("PASSWORD_CREATED", false);
-        if(!isPassCreated){
+        if (!isPassCreated) {
             Intent pickContactIntent = new Intent(this, SetPasswordActivity.class);
             startActivityForResult(pickContactIntent, SET_PASSWORD_REQUEST);
         }
@@ -43,9 +60,11 @@ public class MainActivity extends AppCompatActivity {
                 EditText password = findViewById(R.id.password);
                 String passValue = password.getText().toString();
                 String savedPassValue = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("PASSWORD", null);
-                if(passValue.equals(savedPassValue)) {
+                if (passValue.equals(savedPassValue)) {
                     Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
+                    Intent intent = new Intent(getApplicationContext(), NotebookActivity.class);
+                    startActivity(intent);
                 } else {
                     Snackbar.make(view, "Złe hasło", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -80,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == SET_PASSWORD_REQUEST) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
                 Toast.makeText(getApplicationContext(), "Udało się ustawić hasło", Toast.LENGTH_SHORT).show();
             }
             if (resultCode == Activity.RESULT_CANCELED) {
