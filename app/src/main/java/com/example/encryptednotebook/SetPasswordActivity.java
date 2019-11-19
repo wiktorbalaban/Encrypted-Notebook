@@ -15,6 +15,11 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
 
+import javax.crypto.SecretKey;
+
+import static com.example.encryptednotebook.Cipher.encryptMsg;
+import static com.example.encryptednotebook.Cipher.generateKey;
+
 public class SetPasswordActivity extends AppCompatActivity {
 
     @Override
@@ -33,12 +38,18 @@ public class SetPasswordActivity extends AppCompatActivity {
                 EditText setPass2 = findViewById(R.id.setPass2);
                 String setPass2Value = setPass2.getText().toString();
                 if (setPass1Value.equals(setPass2Value)) {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    prefs.edit().putBoolean("PASSWORD_CREATED", true).apply();
-                    prefs.edit().putString("PASSWORD", setPass1Value).apply();
-                    Intent resultIntent = new Intent();
-                    setResult(Activity.RESULT_OK, resultIntent);
-                    finish();
+                    try {
+                        SecretKey secretKey = generateKey(setPass2Value, getApplicationContext());
+                        String encryptedText = encryptMsg(setPass2Value, secretKey);
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                        prefs.edit().putBoolean("PASSWORD_CREATED", true).apply();
+                        prefs.edit().putString("PASSWORD", encryptedText).apply();
+                        Intent resultIntent = new Intent();
+                        setResult(Activity.RESULT_OK, resultIntent);
+                        finish();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 } else {
                     Snackbar.make(view, "Hasła się różnią, wpisz takie same hasła", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();

@@ -21,6 +21,11 @@ import android.widget.Toast;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import javax.crypto.SecretKey;
+
+import static com.example.encryptednotebook.Cipher.decryptMsg;
+import static com.example.encryptednotebook.Cipher.generateKey;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int SET_PASSWORD_REQUEST = 1;
@@ -57,15 +62,23 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EditText password = findViewById(R.id.password);
-                String passValue = password.getText().toString();
-                String savedPassValue = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("PASSWORD", null);
-                if (passValue.equals(savedPassValue)) {
-                    Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                    Intent intent = new Intent(getApplicationContext(), NotebookActivity.class);
-                    startActivity(intent);
-                } else {
+                try {
+                    EditText password = findViewById(R.id.password);
+                    String passValue = password.getText().toString();
+                    String savedPassValue = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("PASSWORD", null);
+                    SecretKey secretKey = generateKey(passValue, getApplicationContext());
+                    String savedPassValueDecrypted = decryptMsg(savedPassValue, secretKey);
+                    if (passValue.equals(savedPassValueDecrypted)) {
+                        Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                        Intent intent = new Intent(getApplicationContext(), NotebookActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Snackbar.make(view, "Złe hasło", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
                     Snackbar.make(view, "Złe hasło", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
