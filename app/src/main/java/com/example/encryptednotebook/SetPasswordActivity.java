@@ -17,6 +17,7 @@ import android.widget.EditText;
 
 import javax.crypto.SecretKey;
 
+import static com.example.encryptednotebook.Cipher.decryptMsg;
 import static com.example.encryptednotebook.Cipher.encryptMsg;
 import static com.example.encryptednotebook.Cipher.generateKey;
 
@@ -57,5 +58,4 @@ public class SetPasswordActivity extends AppCompatActivity {
             }
         });
     }
-
 }
