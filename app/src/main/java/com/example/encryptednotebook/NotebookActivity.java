@@ -14,11 +14,14 @@ import android.view.View;
 import android.widget.EditText;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
+import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -26,6 +29,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -44,8 +48,9 @@ public class NotebookActivity extends AppCompatActivity {
             try {
                 SecretKey secretKey = generateKey(savedPassValue);
                 String encryptedText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("TEXT", null);
+                //String decryptedText = decryptMsg(encryptedText.getBytes(),secretKey);
                 if (encryptedText != null) {
-                    String noteText = decryptMsg(encryptedText.getBytes(), secretKey);
+                    String noteText = decryptMsg(encryptedText, secretKey);
                     text.setText(noteText);
                 } else {
                     text.setText("Twoja notatka");
@@ -66,7 +71,8 @@ public class NotebookActivity extends AppCompatActivity {
                 if (savedPassValue != null) {
                     try {
                         SecretKey secretKey = generateKey(savedPassValue);
-                        String encryptedText = new String(encryptMsg(textValue, secretKey));
+                        String encryptedText = encryptMsg(textValue, secretKey);
+                        String ddddd = decryptMsg(encryptedText, secretKey);
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("TEXT", encryptedText).apply();
 
                         Snackbar.make(view, "Udało się zapisać", Snackbar.LENGTH_LONG)
@@ -90,27 +96,34 @@ public class NotebookActivity extends AppCompatActivity {
             e.printStackTrace();
             saltBytes = "".getBytes();
         }
-        PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray(), saltBytes, 10, 128);
+        PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray(), saltBytes, 10, 256);
         return new SecretKeySpec(SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512").generateSecret(keySpec).getEncoded(), "AES");
     }
 
-    public byte[] encryptMsg(String message, SecretKey secret)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidParameterSpecException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+    public String encryptMsg(String message, SecretKey secret)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidParameterSpecException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException, InvalidAlgorithmParameterException {
         /* Encrypt the message. */
         Cipher cipher = null;
-        cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secret);
-        byte[] cipherText = cipher.doFinal(message.getBytes("UTF-8"));
-        return cipherText;
+        cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+        AlgorithmParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
+        cipher.init(Cipher.ENCRYPT_MODE, secret, ivSpec);
+        byte[] utfMessageBytes = message.getBytes(StandardCharsets.UTF_8);
+        //byte[] base64MessageBytes = Base64.getUrlDecoder().decode(utfMessageBytes);
+        byte[] cipherText = cipher.doFinal(utfMessageBytes);
+        String result = Base64.getEncoder().encodeToString(cipherText);
+        return result;
     }
 
-    public String decryptMsg(byte[] cipherText, SecretKey secret)
+    public String decryptMsg(String message, SecretKey secret)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidParameterSpecException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException {
         /* Decrypt the message, given derived encContentValues and initialization vector. */
         Cipher cipher = null;
-        cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, secret);
-        String decryptString = new String(cipher.doFinal(cipherText), "UTF-8");
+        cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+        AlgorithmParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
+        cipher.init(Cipher.DECRYPT_MODE, secret, ivSpec);
+        byte[] messageBytes =  Base64.getDecoder().decode(message);//message.getBytes(StandardCharsets.UTF_8);
+        byte[] decryptedBytes = cipher.doFinal(messageBytes);
+        String decryptString = new String(decryptedBytes, StandardCharsets.UTF_8);
         return decryptString;
     }
 
