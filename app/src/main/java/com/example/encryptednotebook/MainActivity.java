@@ -41,9 +41,15 @@ public class MainActivity extends AppCompatActivity {
         if (saltString == null) {
             String randomString = new BigInteger(130, new SecureRandom()).toString(32);
             byte[] salt = new byte[8];
+            byte[] iv = new byte[16];
             try {
-                System.arraycopy(randomString.getBytes(StandardCharsets.UTF_8), 0, salt, 0, 8);
-                prefs.edit().putString(SharedConstants.SALT, new String(salt)).apply();
+                byte[] randomStringBytes = randomString.getBytes(StandardCharsets.UTF_8);
+                System.arraycopy(randomStringBytes, 0, salt, 0, 8);
+                System.arraycopy(randomStringBytes, 8, iv, 0, 16);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(SharedConstants.SALT, new String(salt, StandardCharsets.UTF_8));
+                editor.putString(SharedConstants.INITIAL_VECTOR, new String(iv, StandardCharsets.UTF_8));
+                editor.apply();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -64,7 +70,10 @@ public class MainActivity extends AppCompatActivity {
                     EditText password = findViewById(R.id.passphrase);
                     String passValue = password.getText().toString();
                     String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
-                    Cipher cipher = new Cipher(prefs.getString(SharedConstants.SALT, null), passValue);
+                    Cipher cipher = new Cipher(
+                            prefs.getString(SharedConstants.SALT, null),
+                            prefs.getString(SharedConstants.INITIAL_VECTOR, null),
+                            passValue);
                     String savedPassValueDecrypted = cipher.decryptString(savedPassValue);
                     if (passValue.equals(savedPassValueDecrypted)) {
                         Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)

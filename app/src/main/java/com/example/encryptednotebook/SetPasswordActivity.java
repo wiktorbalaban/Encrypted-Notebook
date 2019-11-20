@@ -35,7 +35,10 @@ public class SetPasswordActivity extends AppCompatActivity {
                 if (setPass1Value.equals(setPass2Value)) {
                     try {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                        Cipher cipher = new Cipher(prefs.getString(SharedConstants.SALT, null), setPass2Value);
+                        Cipher cipher = new Cipher(
+                                prefs.getString(SharedConstants.SALT, null),
+                                prefs.getString(SharedConstants.INITIAL_VECTOR, null),
+                                setPass2Value);
                         String encryptedText = cipher.encryptString(setPass2Value);
 
                         SharedPreferences.Editor editor = prefs.edit();

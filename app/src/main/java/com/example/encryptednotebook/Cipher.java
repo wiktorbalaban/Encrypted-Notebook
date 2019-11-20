@@ -21,10 +21,12 @@ class Cipher {
 
     private String salt;
     private SecretKey secretKey;
+    private String initialVector;
 
-    Cipher(String salt, String password)
+    Cipher(String salt, String initialVector, String password)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         this.salt = salt;
+        this.initialVector = initialVector;
         secretKey = generateKey(password);
     }
 
@@ -32,7 +34,7 @@ class Cipher {
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] saltBytes;
         try {
-            saltBytes = salt.getBytes();
+            saltBytes = salt.getBytes(StandardCharsets.UTF_8);
         } catch (NullPointerException e) {
             e.printStackTrace();
             saltBytes = "".getBytes();
@@ -44,7 +46,7 @@ class Cipher {
     String encryptString(String message)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5PADDING");
-        AlgorithmParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
+        AlgorithmParameterSpec ivSpec = new IvParameterSpec(initialVector.getBytes(StandardCharsets.UTF_8));
         cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKey, ivSpec);
         byte[] utfMessageBytes = message.getBytes(StandardCharsets.UTF_8);
         byte[] cipherText = cipher.doFinal(utfMessageBytes);
@@ -54,7 +56,7 @@ class Cipher {
     String decryptString(String message)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5PADDING");
-        AlgorithmParameterSpec ivSpec = new IvParameterSpec(new byte[16]);
+        AlgorithmParameterSpec ivSpec = new IvParameterSpec(initialVector.getBytes(StandardCharsets.UTF_8));
         cipher.init(javax.crypto.Cipher.DECRYPT_MODE, secretKey, ivSpec);
         byte[] messageBytes = Base64.getDecoder().decode(message);
         byte[] decryptedBytes = cipher.doFinal(messageBytes);

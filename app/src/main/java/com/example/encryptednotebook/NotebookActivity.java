@@ -26,7 +26,10 @@ public class NotebookActivity extends AppCompatActivity {
         final String password = getIntent().getStringExtra(IntentConstants.DECRYPTED_PASS);
         if (password != null) {
             try {
-                Cipher cipher = new Cipher(prefs.getString(SharedConstants.SALT, null), password);
+                Cipher cipher = new Cipher(
+                        prefs.getString(SharedConstants.SALT, null),
+                        prefs.getString(SharedConstants.INITIAL_VECTOR, null),
+                        password);
                 String encryptedText = prefs.getString(SharedConstants.NOTE, null);
                 if (encryptedText != null) {
                     String noteText = cipher.decryptString(encryptedText);
@@ -48,7 +51,10 @@ public class NotebookActivity extends AppCompatActivity {
 
                 if (password != null) {
                     try {
-                        Cipher cipher = new Cipher(prefs.getString(SharedConstants.SALT, null), password);
+                        Cipher cipher = new Cipher(
+                                prefs.getString(SharedConstants.SALT, null),
+                                prefs.getString(SharedConstants.INITIAL_VECTOR, null),
+                                password);
                         String encryptedText = cipher.encryptString(noteToSave);
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(SharedConstants.NOTE, encryptedText).apply();
 

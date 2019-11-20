@@ -41,13 +41,14 @@ public class ChangePassword extends AppCompatActivity {
                             String oldPasswordUserInput = password.getText().toString();
                             String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
                             String cipherSalt = prefs.getString(SharedConstants.SALT, null);
-                            Cipher oldCipher = new Cipher(cipherSalt, oldPasswordUserInput);
+                            String cipherInitialVector = prefs.getString(SharedConstants.INITIAL_VECTOR, null);
+                            Cipher oldCipher = new Cipher(cipherSalt, cipherInitialVector, oldPasswordUserInput);
                             String savedPassValueDecrypted = oldCipher.decryptString(savedPassValue);
                             if (oldPasswordUserInput.equals(savedPassValueDecrypted)) {
                                 Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
                                         .setAction("Action", null).show();
 
-                                Cipher newCipher = new Cipher(cipherSalt, setPass2Value);
+                                Cipher newCipher = new Cipher(cipherSalt, cipherInitialVector, setPass2Value);
                                 String encryptedPassword = newCipher.encryptString(setPass2Value);
 
                                 String encryptedOldText = prefs.getString(SharedConstants.NOTE, null);
