@@ -2,6 +2,7 @@ package com.example.encryptednotebook;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -20,12 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-
-import javax.crypto.SecretKey;
-
-import static com.example.encryptednotebook.Cipher.decryptMsg;
-import static com.example.encryptednotebook.Cipher.generateKey;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,13 +37,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         TextView hello = findViewById(R.id.hello);
         hello.setText("Wpisz hasło");
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String saltString = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("SALT", null);
+        String saltString = prefs.getString("SALT", null);
         if (saltString == null) {
             String randomString = new BigInteger(130, new SecureRandom()).toString(32);
             byte[] salt = new byte[8];
             try {
-                System.arraycopy(randomString.getBytes("UTF-8"), 0, salt, 0, 8);
+                System.arraycopy(randomString.getBytes(StandardCharsets.UTF_8), 0, salt, 0, 8);
                 PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("SALT", new String(salt)).apply();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        boolean isPassCreated = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("PASSWORD_CREATED", false);
+        boolean isPassCreated = prefs.getBoolean("PASSWORD_CREATED", false);
         if (!isPassCreated) {
             Intent pickContactIntent = new Intent(this, SetPasswordActivity.class);
             startActivityForResult(pickContactIntent, SET_PASSWORD_REQUEST);
@@ -67,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     EditText password = findViewById(R.id.password);
                     String passValue = password.getText().toString();
-                    String savedPassValue = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("PASSWORD", null);
-                    SecretKey secretKey = generateKey(passValue, getApplicationContext());
-                    String savedPassValueDecrypted = decryptMsg(savedPassValue, secretKey);
+                    String savedPassValue = prefs.getString("PASSWORD", null);
+                    Cipher cipher = new Cipher(prefs.getString("SALT", null), passValue);
+                    String savedPassValueDecrypted = cipher.decryptString(savedPassValue);
                     if (passValue.equals(savedPassValueDecrypted)) {
                         Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
@@ -122,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == SET_PASSWORD_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent pickContactIntent = new Intent(this, SetPasswordActivity.class);
                 startActivityForResult(pickContactIntent, SET_PASSWORD_REQUEST);
             }
-        } else if(requestCode == CHANGE_PASSWORD_REQUEST) {
+        } else if (requestCode == CHANGE_PASSWORD_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 Toast.makeText(getApplicationContext(), "Udało się zmienić hasło", Toast.LENGTH_SHORT).show();
             }

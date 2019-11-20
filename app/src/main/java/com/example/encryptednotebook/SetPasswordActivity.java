@@ -15,12 +15,6 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
 
-import javax.crypto.SecretKey;
-
-import static com.example.encryptednotebook.Cipher.decryptMsg;
-import static com.example.encryptednotebook.Cipher.encryptMsg;
-import static com.example.encryptednotebook.Cipher.generateKey;
-
 public class SetPasswordActivity extends AppCompatActivity {
 
     @Override
@@ -40,15 +34,19 @@ public class SetPasswordActivity extends AppCompatActivity {
                 String setPass2Value = setPass2.getText().toString();
                 if (setPass1Value.equals(setPass2Value)) {
                     try {
-                        SecretKey secretKey = generateKey(setPass2Value, getApplicationContext());
-                        String encryptedText = encryptMsg(setPass2Value, secretKey);
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                        prefs.edit().putBoolean("PASSWORD_CREATED", true).apply();
-                        prefs.edit().putString("PASSWORD", encryptedText).apply();
+                        Cipher cipher = new Cipher(prefs.getString("SALT", null), setPass2Value);
+                        String encryptedText = cipher.encryptString(setPass2Value);
+
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("PASSWORD_CREATED", true);
+                        editor.putString("PASSWORD", encryptedText);
+                        editor.apply();
+
                         Intent resultIntent = new Intent();
                         setResult(Activity.RESULT_OK, resultIntent);
                         finish();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {

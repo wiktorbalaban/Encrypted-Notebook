@@ -1,5 +1,6 @@
 package com.example.encryptednotebook;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
@@ -11,15 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import javax.crypto.SecretKey;
-
-import static com.example.encryptednotebook.Cipher.decryptMsg;
-import static com.example.encryptednotebook.Cipher.encryptMsg;
-import static com.example.encryptednotebook.Cipher.generateKey;
-
 public class NotebookActivity extends AppCompatActivity {
-
-    String mSavedPassValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,16 +21,15 @@ public class NotebookActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         final EditText text = findViewById(R.id.text);
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        mSavedPassValue = getIntent().getStringExtra("DECRYPTED_PASS");
-        //= PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("PASSWORD", null);
-        if (mSavedPassValue != null) {
+        final String password = getIntent().getStringExtra("DECRYPTED_PASS");
+        if (password != null) {
             try {
-                SecretKey secretKey = generateKey(mSavedPassValue,getApplicationContext());
-                String encryptedText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("TEXT", null);
-                //String decryptedText = decryptMsg(encryptedText.getBytes(),secretKey);
+                Cipher cipher = new Cipher(prefs.getString("SALT", null), password);
+                String encryptedText = prefs.getString("TEXT", null);
                 if (encryptedText != null) {
-                    String noteText = decryptMsg(encryptedText, secretKey);
+                    String noteText = cipher.decryptString(encryptedText);
                     text.setText(noteText);
                 } else {
                     text.setText("Twoja notatka");
@@ -52,13 +44,12 @@ public class NotebookActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String textValue = text.getText().toString();
+                String noteToSave = text.getText().toString();
 
-                if (mSavedPassValue != null) {
+                if (password != null) {
                     try {
-                        SecretKey secretKey = generateKey(mSavedPassValue,getApplicationContext());
-                        String encryptedText = encryptMsg(textValue, secretKey);
-                        String ddddd = decryptMsg(encryptedText, secretKey);
+                        Cipher cipher = new Cipher(prefs.getString("SALT", null), password);
+                        String encryptedText = cipher.encryptString(noteToSave);
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("TEXT", encryptedText).apply();
 
                         Snackbar.make(view, "Udało się zapisać", Snackbar.LENGTH_LONG)
@@ -70,7 +61,6 @@ public class NotebookActivity extends AppCompatActivity {
             }
         });
     }
-
 
 
 }
