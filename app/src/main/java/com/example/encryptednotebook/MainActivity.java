@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int SET_PASSWORD_REQUEST = 1;
     private static final int CHANGE_PASSWORD_REQUEST = 2;
 
+    EditText password;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    EditText password = findViewById(R.id.passphrase);
+                    password = findViewById(R.id.passphrase);
                     String passValue = password.getText().toString();
                     String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
                     Cipher cipher = new Cipher(
@@ -101,6 +103,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(pickContactIntent, CHANGE_PASSWORD_REQUEST);
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (password != null)
+            password.setText("");
     }
 
     @Override
