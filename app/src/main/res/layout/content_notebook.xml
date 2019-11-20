@@ -13,7 +13,10 @@
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:autofillHints="@string/write_something"
         android:ems="10"
         android:gravity="start|top"
-        android:inputType="textMultiLine"/>
+        android:hint="@string/write_something"
+        android:inputType="textMultiLine" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

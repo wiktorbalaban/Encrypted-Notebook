@@ -17,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.math.BigInteger;
@@ -35,8 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        TextView hello = findViewById(R.id.hello);
-        hello.setText("Wpisz hasło");
+
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String saltString = prefs.getString(SharedConstants.SALT, null);
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    EditText password = findViewById(R.id.password);
+                    EditText password = findViewById(R.id.passphrase);
                     String passValue = password.getText().toString();
                     String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
                     Cipher cipher = new Cipher(prefs.getString(SharedConstants.SALT, null), passValue);
@@ -86,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button changePasswordButton = findViewById(R.id.changePassword);
+        Button changePasswordButton = findViewById(R.id.changePassphrase);
         changePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
