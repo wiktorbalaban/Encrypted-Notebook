@@ -39,20 +39,20 @@ public class MainActivity extends AppCompatActivity {
         hello.setText("Wpisz hasło");
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String saltString = prefs.getString("SALT", null);
+        String saltString = prefs.getString(SharedConstants.SALT, null);
         if (saltString == null) {
             String randomString = new BigInteger(130, new SecureRandom()).toString(32);
             byte[] salt = new byte[8];
             try {
                 System.arraycopy(randomString.getBytes(StandardCharsets.UTF_8), 0, salt, 0, 8);
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("SALT", new String(salt)).apply();
+                prefs.edit().putString(SharedConstants.SALT, new String(salt)).apply();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
 
-        boolean isPassCreated = prefs.getBoolean("PASSWORD_CREATED", false);
+        boolean isPassCreated = prefs.getBoolean(SharedConstants.PASSWORD_CREATED, false);
         if (!isPassCreated) {
             Intent pickContactIntent = new Intent(this, SetPasswordActivity.class);
             startActivityForResult(pickContactIntent, SET_PASSWORD_REQUEST);
@@ -65,14 +65,14 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     EditText password = findViewById(R.id.password);
                     String passValue = password.getText().toString();
-                    String savedPassValue = prefs.getString("PASSWORD", null);
-                    Cipher cipher = new Cipher(prefs.getString("SALT", null), passValue);
+                    String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
+                    Cipher cipher = new Cipher(prefs.getString(SharedConstants.SALT, null), passValue);
                     String savedPassValueDecrypted = cipher.decryptString(savedPassValue);
                     if (passValue.equals(savedPassValueDecrypted)) {
                         Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                         Intent intent = new Intent(getApplicationContext(), NotebookActivity.class);
-                        intent.putExtra("DECRYPTED_PASS", passValue);
+                        intent.putExtra(IntentConstants.DECRYPTED_PASS, passValue);
                         startActivity(intent);
                     } else {
                         Snackbar.make(view, "Złe hasło", Snackbar.LENGTH_LONG)

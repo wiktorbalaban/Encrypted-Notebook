@@ -39,8 +39,8 @@ public class ChangePassword extends AppCompatActivity {
                         try {
                             EditText password = findViewById(R.id.oldPass);
                             String oldPasswordUserInput = password.getText().toString();
-                            String savedPassValue = prefs.getString("PASSWORD", null);
-                            String cipherSalt = prefs.getString("SALT", null);
+                            String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
+                            String cipherSalt = prefs.getString(SharedConstants.SALT, null);
                             Cipher oldCipher = new Cipher(cipherSalt, oldPasswordUserInput);
                             String savedPassValueDecrypted = oldCipher.decryptString(savedPassValue);
                             if (oldPasswordUserInput.equals(savedPassValueDecrypted)) {
@@ -50,13 +50,13 @@ public class ChangePassword extends AppCompatActivity {
                                 Cipher newCipher = new Cipher(cipherSalt, setPass2Value);
                                 String encryptedPassword = newCipher.encryptString(setPass2Value);
 
-                                String encryptedOldText = prefs.getString("TEXT", null);
+                                String encryptedOldText = prefs.getString(SharedConstants.NOTE, null);
                                 if (encryptedOldText != null) {
                                     String decryptedText = oldCipher.decryptString(encryptedOldText);
                                     String encryptedNewText = newCipher.encryptString(decryptedText);
                                     SharedPreferences.Editor editor = prefs.edit();
-                                    editor.putString("PASSWORD", encryptedPassword);
-                                    editor.putString("TEXT", encryptedNewText);
+                                    editor.putString(SharedConstants.PASSWORD, encryptedPassword);
+                                    editor.putString(SharedConstants.NOTE, encryptedNewText);
                                     editor.apply();
                                     Intent resultIntent = new Intent();
                                     setResult(Activity.RESULT_OK, resultIntent);

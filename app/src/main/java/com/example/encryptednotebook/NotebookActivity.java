@@ -23,11 +23,11 @@ public class NotebookActivity extends AppCompatActivity {
         final EditText text = findViewById(R.id.text);
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        final String password = getIntent().getStringExtra("DECRYPTED_PASS");
+        final String password = getIntent().getStringExtra(IntentConstants.DECRYPTED_PASS);
         if (password != null) {
             try {
-                Cipher cipher = new Cipher(prefs.getString("SALT", null), password);
-                String encryptedText = prefs.getString("TEXT", null);
+                Cipher cipher = new Cipher(prefs.getString(SharedConstants.SALT, null), password);
+                String encryptedText = prefs.getString(SharedConstants.NOTE, null);
                 if (encryptedText != null) {
                     String noteText = cipher.decryptString(encryptedText);
                     text.setText(noteText);
@@ -48,9 +48,9 @@ public class NotebookActivity extends AppCompatActivity {
 
                 if (password != null) {
                     try {
-                        Cipher cipher = new Cipher(prefs.getString("SALT", null), password);
+                        Cipher cipher = new Cipher(prefs.getString(SharedConstants.SALT, null), password);
                         String encryptedText = cipher.encryptString(noteToSave);
-                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("TEXT", encryptedText).apply();
+                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(SharedConstants.NOTE, encryptedText).apply();
 
                         Snackbar.make(view, "Udało się zapisać", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
