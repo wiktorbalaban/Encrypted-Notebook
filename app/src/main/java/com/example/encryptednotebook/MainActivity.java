@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ import static com.example.encryptednotebook.Cipher.generateKey;
 public class MainActivity extends AppCompatActivity {
 
     public static final int SET_PASSWORD_REQUEST = 1;
+    public static final int CHANGE_PASSWORD_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,16 +74,26 @@ public class MainActivity extends AppCompatActivity {
                         Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                         Intent intent = new Intent(getApplicationContext(), NotebookActivity.class);
+                        intent.putExtra("DECRYPTED_PASS", passValue);
                         startActivity(intent);
                     } else {
                         Snackbar.make(view, "Złe hasło", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     Snackbar.make(view, "Złe hasło", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
+            }
+        });
+
+        Button changePasswordButton = findViewById(R.id.changePassword);
+        changePasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent pickContactIntent = new Intent(getApplicationContext(), ChangePassword.class);
+                startActivityForResult(pickContactIntent, CHANGE_PASSWORD_REQUEST);
             }
         });
     }
@@ -118,6 +130,13 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_CANCELED) {
                 Intent pickContactIntent = new Intent(this, SetPasswordActivity.class);
                 startActivityForResult(pickContactIntent, SET_PASSWORD_REQUEST);
+            }
+        } else if(requestCode == CHANGE_PASSWORD_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                Toast.makeText(getApplicationContext(), "Udało się zmienić hasło", Toast.LENGTH_SHORT).show();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(getApplicationContext(), "Nie udało się zmienić hasła", Toast.LENGTH_SHORT).show();
             }
         }
     }

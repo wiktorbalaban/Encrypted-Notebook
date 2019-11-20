@@ -19,6 +19,8 @@ import static com.example.encryptednotebook.Cipher.generateKey;
 
 public class NotebookActivity extends AppCompatActivity {
 
+    String mSavedPassValue;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,10 +29,11 @@ public class NotebookActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         final EditText text = findViewById(R.id.text);
 
-        String savedPassValue = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("PASSWORD", null);
-        if (savedPassValue != null) {
+        mSavedPassValue = getIntent().getStringExtra("DECRYPTED_PASS");
+        //= PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("PASSWORD", null);
+        if (mSavedPassValue != null) {
             try {
-                SecretKey secretKey = generateKey(savedPassValue,getApplicationContext());
+                SecretKey secretKey = generateKey(mSavedPassValue,getApplicationContext());
                 String encryptedText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("TEXT", null);
                 //String decryptedText = decryptMsg(encryptedText.getBytes(),secretKey);
                 if (encryptedText != null) {
@@ -51,12 +54,11 @@ public class NotebookActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String textValue = text.getText().toString();
 
-                String savedPassValue = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("PASSWORD", null);
-                if (savedPassValue != null) {
+                if (mSavedPassValue != null) {
                     try {
-                        SecretKey secretKey = generateKey(savedPassValue,getApplicationContext());
+                        SecretKey secretKey = generateKey(mSavedPassValue,getApplicationContext());
                         String encryptedText = encryptMsg(textValue, secretKey);
-                        //String ddddd = decryptMsg(encryptedText, secretKey);
+                        String ddddd = decryptMsg(encryptedText, secretKey);
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("TEXT", encryptedText).apply();
 
                         Snackbar.make(view, "Udało się zapisać", Snackbar.LENGTH_LONG)

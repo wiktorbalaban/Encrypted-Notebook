@@ -40,7 +40,7 @@ public class ChangePassword extends AppCompatActivity {
                 String setPass2Value = setPass2.getText().toString();
                 if (setPass1Value.equals(setPass2Value)) {
                     try {
-                        String encryptedText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("TEXT", null);
+                        //String encryptedText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("TEXT", null);
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
                         try {
@@ -54,14 +54,14 @@ public class ChangePassword extends AppCompatActivity {
                                         .setAction("Action", null).show();
 
                                 SecretKey newSecretKey = generateKey(setPass2Value, getApplicationContext());
-                                String encryptedText = encryptMsg(setPass2Value, newSecretKey);
-                                prefs.edit().putBoolean("PASSWORD_CREATED", true).apply();
-                                prefs.edit().putString("PASSWORD", encryptedText).apply();
+                                String encryptedPassword = encryptMsg(setPass2Value, newSecretKey);
+
 
                                 String encryptedOldText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("TEXT", null);
                                 if(encryptedOldText!=null){
                                     String decrptedText = decryptMsg(encryptedOldText, oldSecretKey);
                                     String encrptedNewText = encryptMsg(decrptedText, newSecretKey);
+                                    prefs.edit().putString("PASSWORD", encryptedPassword).apply();
                                     PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString("TEXT", encrptedNewText).apply();
                                     Intent resultIntent = new Intent();
                                     setResult(Activity.RESULT_OK, resultIntent);
