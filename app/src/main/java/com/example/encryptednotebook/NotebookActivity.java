@@ -35,7 +35,7 @@ public class NotebookActivity extends AppCompatActivity {
                     String noteText = cipher.decryptString(encryptedText);
                     text.setText(noteText);
                 } else {
-                    text.setText("Twoja notatka");
+                    text.setText(R.string.your_note);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -19,9 +19,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 class Cipher {
 
-    private String salt;
+    private final String salt;
     private SecretKey secretKey;
-    private String initialVector;
+    private final String initialVector;
 
     Cipher(String salt, String initialVector, String password)
             throws NoSuchAlgorithmException, InvalidKeySpecException {

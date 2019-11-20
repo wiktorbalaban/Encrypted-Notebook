@@ -25,8 +25,8 @@ import java.security.SecureRandom;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int SET_PASSWORD_REQUEST = 1;
-    public static final int CHANGE_PASSWORD_REQUEST = 2;
+    private static final int SET_PASSWORD_REQUEST = 1;
+    private static final int CHANGE_PASSWORD_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
