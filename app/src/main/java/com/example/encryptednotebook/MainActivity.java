@@ -41,11 +41,14 @@ public class MainActivity extends AppCompatActivity {
 
         String saltString = prefs.getString(SharedConstants.SALT, null);
         if (saltString == null) {
-            String randomString = new BigInteger(130, new SecureRandom()).toString(32);
-            byte[] salt = new byte[8];
-            byte[] iv = new byte[16];
+            int saltBytes = 8;
+            byte[] salt = new byte[saltBytes];
+            int ivBytes = 16;
+            byte[] iv = new byte[ivBytes];
+            int bigIntegerBits = (saltBytes + ivBytes) * 8;
+            String randomString = new BigInteger(bigIntegerBits, new SecureRandom()).toString(32);//TODO: może da się bardzoej losowo
             try {
-                byte[] randomStringBytes = randomString.getBytes(StandardCharsets.UTF_8);
+                byte[] randomStringBytes = randomString.getBytes(StandardCharsets.UTF_8);//To i tak daje więcej bitów niż potrzebne 192
                 System.arraycopy(randomStringBytes, 0, salt, 0, 8);
                 System.arraycopy(randomStringBytes, 8, iv, 0, 16);
                 SharedPreferences.Editor editor = prefs.edit();
