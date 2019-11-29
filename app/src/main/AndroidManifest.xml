@@ -14,7 +14,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".ChangePassword"
-            android:label="@string/title_activity_change_password"
+            android:label="@string/title_activity_change_passphrase"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".NotebookActivity"

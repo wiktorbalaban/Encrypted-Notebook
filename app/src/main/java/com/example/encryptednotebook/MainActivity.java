@@ -94,15 +94,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        Button changePasswordButton = findViewById(R.id.changePassphrase);
-        changePasswordButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent pickContactIntent = new Intent(getApplicationContext(), ChangePassword.class);
-                startActivityForResult(pickContactIntent, CHANGE_PASSWORD_REQUEST);
-            }
-        });
     }
 
     @Override
@@ -127,8 +118,9 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_change_passphrase) {
+            Intent pickContactIntent = new Intent(getApplicationContext(), ChangePassword.class);
+            startActivityForResult(pickContactIntent, CHANGE_PASSWORD_REQUEST);
         }
 
         return super.onOptionsItemSelected(item);
