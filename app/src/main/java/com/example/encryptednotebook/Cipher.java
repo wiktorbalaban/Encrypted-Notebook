@@ -19,6 +19,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 class Cipher {
 
+    private static final String CIPHER_TYPE = "AES/CBC/PKCS5PADDING";
+
     private final String salt;
     private SecretKey secretKey;
     private final String initialVector;
@@ -45,7 +47,7 @@ class Cipher {
 
     String encryptString(String message)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
-        javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5PADDING");
+        javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_TYPE);
         AlgorithmParameterSpec ivSpec = new IvParameterSpec(initialVector.getBytes(StandardCharsets.UTF_8));
         cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKey, ivSpec);
         byte[] utfMessageBytes = message.getBytes(StandardCharsets.UTF_8);
@@ -55,7 +57,7 @@ class Cipher {
 
     String decryptString(String message)
             throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5PADDING");
+        javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_TYPE);
         AlgorithmParameterSpec ivSpec = new IvParameterSpec(initialVector.getBytes(StandardCharsets.UTF_8));
         cipher.init(javax.crypto.Cipher.DECRYPT_MODE, secretKey, ivSpec);
         byte[] messageBytes = Base64.getDecoder().decode(message);

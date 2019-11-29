@@ -10,4 +10,11 @@
     <string name="enter_new_password">Enter the new passphrase</string>
     <string name="write_something">Write something</string>
     <string name="your_note">Your note</string>
+    <string name="wrong_passphrase">Wrong passphrase</string>
+    <string name="passphrase_set_successfully">Passphrase set successfully</string>
+    <string name="passphrase_change_successfully">Passphrase change successfully</string>
+    <string name="passphrase_change_failed">Passphrase change failed</string>
+    <string name="saved_successfully">Saved successfully</string>
+    <string name="saved_failed">Saved failed</string>
+    <string name="different_passphrases_message">Passphrases do not match, enter the same passphrases</string>
 </resources>

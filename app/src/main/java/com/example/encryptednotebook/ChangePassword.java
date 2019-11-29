@@ -45,9 +45,6 @@ public class ChangePassword extends AppCompatActivity {
                             Cipher oldCipher = new Cipher(cipherSalt, cipherInitialVector, oldPasswordUserInput);
                             String savedPassValueDecrypted = oldCipher.decryptString(savedPassValue);
                             if (oldPasswordUserInput.equals(savedPassValueDecrypted)) {
-                                Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
-                                        .setAction("Action", null).show();
-
                                 Cipher newCipher = new Cipher(cipherSalt, cipherInitialVector, setPass2Value);
                                 String encryptedPassword = newCipher.encryptString(setPass2Value);
 
@@ -65,12 +62,12 @@ public class ChangePassword extends AppCompatActivity {
                                 }
 
                             } else {
-                                Snackbar.make(view, "Złe hasło", Snackbar.LENGTH_LONG)
+                                Snackbar.make(view, R.string.wrong_passphrase, Snackbar.LENGTH_LONG)
                                         .setAction("Action", null).show();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                            Snackbar.make(view, "Złe hasło", Snackbar.LENGTH_LONG)
+                            Snackbar.make(view, R.string.wrong_passphrase, Snackbar.LENGTH_LONG)
                                     .setAction("Action", null).show();
                         }
 
@@ -78,7 +75,7 @@ public class ChangePassword extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 } else {
-                    Snackbar.make(view, "Hasła się różnią, wpisz takie same hasła", Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, R.string.different_passphrases_message, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
             }

@@ -53,7 +53,7 @@ public class SetPasswordActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 } else {
-                    Snackbar.make(view, "Hasła się różnią, wpisz takie same hasła", Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, getString(R.string.different_passphrases_message), Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 }
             }

@@ -58,10 +58,12 @@ public class NotebookActivity extends AppCompatActivity {
                         String encryptedText = cipher.encryptString(noteToSave);
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(SharedConstants.NOTE, encryptedText).apply();
 
-                        Snackbar.make(view, "Udało się zapisać", Snackbar.LENGTH_LONG)
+                        Snackbar.make(view, getString(R.string.saved_successfully), Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                     } catch (Exception e) {
                         e.printStackTrace();
+                        Snackbar.make(view, getString(R.string.saved_failed), Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show();
                     }
                 }
             }
