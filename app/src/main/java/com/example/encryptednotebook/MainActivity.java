@@ -78,8 +78,6 @@ public class MainActivity extends AppCompatActivity {
                             passValue);
                     String savedPassValueDecrypted = cipher.decryptString(savedPassValue);
                     if (passValue.equals(savedPassValueDecrypted)) {
-                        Snackbar.make(view, "Dobre hasło", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
                         Intent intent = new Intent(getApplicationContext(), NotebookActivity.class);
                         intent.putExtra(IntentConstants.DECRYPTED_PASS, passValue);
                         startActivity(intent);
