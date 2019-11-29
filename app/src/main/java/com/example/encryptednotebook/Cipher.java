@@ -39,7 +39,7 @@ class Cipher {
             e.printStackTrace();
             saltBytes = "".getBytes();
         }
-        PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray(), saltBytes, 10, 256);
+        PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray(), saltBytes, 10000, 256);
         return new SecretKeySpec(SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512").generateSecret(keySpec).getEncoded(), "AES");
     }
 
