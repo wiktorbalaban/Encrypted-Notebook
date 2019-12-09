@@ -17,4 +17,6 @@
     <string name="saved_successfully">Saved successfully</string>
     <string name="saved_failed">Saved failed</string>
     <string name="different_passphrases_message">Passphrases do not match, enter the same passphrases</string>
+    <string name="unlock_note">Unlock note</string>
+    <string name="cancel">Cancel</string>
 </resources>
