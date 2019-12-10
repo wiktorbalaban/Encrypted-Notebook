@@ -42,16 +42,16 @@ public class ChangePassword extends AppCompatActivity {
                             String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
                             String cipherSalt = prefs.getString(SharedConstants.SALT, null);
                             String cipherInitialVector = prefs.getString(SharedConstants.INITIAL_VECTOR, null);
-                            Cipher oldCipher = new Cipher(cipherSalt, cipherInitialVector, oldPasswordUserInput);
-                            String savedPassValueDecrypted = oldCipher.decryptString(savedPassValue);
+                            Cipher oldCipher = new Cipher(cipherInitialVector);
+                            String savedPassValueDecrypted = oldCipher.decryptString(savedPassValue,prefs);
                             if (oldPasswordUserInput.equals(savedPassValueDecrypted)) {
-                                Cipher newCipher = new Cipher(cipherSalt, cipherInitialVector, setPass2Value);
-                                String encryptedPassword = newCipher.encryptString(setPass2Value);
+                                Cipher newCipher = new Cipher(cipherInitialVector);
+                                String encryptedPassword = newCipher.encryptString(setPass2Value,prefs);
 
                                 String encryptedOldText = prefs.getString(SharedConstants.NOTE, null);
                                 if (encryptedOldText != null) {
-                                    String decryptedText = oldCipher.decryptString(encryptedOldText);
-                                    String encryptedNewText = newCipher.encryptString(decryptedText);
+                                    String decryptedText = oldCipher.decryptString(encryptedOldText,prefs);
+                                    String encryptedNewText = newCipher.encryptString(decryptedText,prefs);
                                     SharedPreferences.Editor editor = prefs.edit();
                                     editor.putString(SharedConstants.PASSWORD, encryptedPassword);
                                     editor.putString(SharedConstants.NOTE, encryptedNewText);

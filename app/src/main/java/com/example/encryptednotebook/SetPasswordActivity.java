@@ -15,6 +15,10 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+
 public class SetPasswordActivity extends AppCompatActivity {
 
     @Override
@@ -23,6 +27,12 @@ public class SetPasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_set_password);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        try {
+            Cipher.generateKey();
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        }
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -36,10 +46,8 @@ public class SetPasswordActivity extends AppCompatActivity {
                     try {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                         Cipher cipher = new Cipher(
-                                prefs.getString(SharedConstants.SALT, null),
-                                prefs.getString(SharedConstants.INITIAL_VECTOR, null),
-                                setPass2Value);
-                        String encryptedText = cipher.encryptString(setPass2Value);
+                                prefs.getString(SharedConstants.INITIAL_VECTOR, null));
+                        String encryptedText = cipher.encryptString(setPass2Value,prefs);
 
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean(SharedConstants.PASSWORD_CREATED, true);

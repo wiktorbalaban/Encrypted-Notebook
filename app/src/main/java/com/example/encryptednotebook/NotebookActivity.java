@@ -27,12 +27,10 @@ public class NotebookActivity extends AppCompatActivity {
         if (password != null) {
             try {
                 Cipher cipher = new Cipher(
-                        prefs.getString(SharedConstants.SALT, null),
-                        prefs.getString(SharedConstants.INITIAL_VECTOR, null),
-                        password);
+                        prefs.getString(SharedConstants.INITIAL_VECTOR, null));
                 String encryptedText = prefs.getString(SharedConstants.NOTE, null);
                 if (encryptedText != null) {
-                    String noteText = cipher.decryptString(encryptedText);
+                    String noteText = cipher.decryptString(encryptedText,prefs);
                     text.setText(noteText);
                 } else {
                     text.setText(R.string.your_note);
@@ -52,10 +50,8 @@ public class NotebookActivity extends AppCompatActivity {
                 if (password != null) {
                     try {
                         Cipher cipher = new Cipher(
-                                prefs.getString(SharedConstants.SALT, null),
-                                prefs.getString(SharedConstants.INITIAL_VECTOR, null),
-                                password);
-                        String encryptedText = cipher.encryptString(noteToSave);
+                                prefs.getString(SharedConstants.INITIAL_VECTOR, null));
+                        String encryptedText = cipher.encryptString(noteToSave,prefs);
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(SharedConstants.NOTE, encryptedText).apply();
 
                         Snackbar.make(view, getString(R.string.saved_successfully), Snackbar.LENGTH_LONG)
