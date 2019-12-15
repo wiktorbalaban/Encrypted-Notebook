@@ -29,13 +29,13 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-class Cipher {
+class CipherOld {
 
     private static final String CIPHER_TYPE = "AES/GCM/NoPadding";
 
     private final String initialVector;
 
-    Cipher(String initialVector) {
+    CipherOld(String initialVector) {
         this.initialVector = initialVector;
     }
 
@@ -47,7 +47,7 @@ class Cipher {
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
                 //.setUserAuthenticationRequired(true) // 2 requires lock screen, invalidated if lock screen is disabled
-                .setUserAuthenticationValidityDurationSeconds(30) // 3 only available x seconds from password authentication. -1 requires finger print - every time
+                .setUserAuthenticationValidityDurationSeconds(-1) // 3 only available x seconds from password authentication. -1 requires finger print - every time
                 .setRandomizedEncryptionRequired(true) // 4 different ciphertext for same plaintext on each call
                 .build();
         keyGenerator.init(keyGenParameterSpec);

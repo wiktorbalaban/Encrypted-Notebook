@@ -29,7 +29,7 @@ public class SetPasswordActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         try {
-            Cipher.generateKey();
+            CipherOld.generateKey();
         } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
@@ -45,7 +45,7 @@ public class SetPasswordActivity extends AppCompatActivity {
                 if (setPass1Value.equals(setPass2Value)) {
                     try {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                        Cipher cipher = new Cipher(
+                        CipherOld cipher = new CipherOld(
                                 prefs.getString(SharedConstants.INITIAL_VECTOR, null));
                         String encryptedText = cipher.encryptString(setPass2Value,prefs);
 

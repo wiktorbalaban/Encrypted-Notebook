@@ -42,10 +42,10 @@ public class ChangePassword extends AppCompatActivity {
                             String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
                             String cipherSalt = prefs.getString(SharedConstants.SALT, null);
                             String cipherInitialVector = prefs.getString(SharedConstants.INITIAL_VECTOR, null);
-                            Cipher oldCipher = new Cipher(cipherInitialVector);
+                            CipherOld oldCipher = new CipherOld(cipherInitialVector);
                             String savedPassValueDecrypted = oldCipher.decryptString(savedPassValue,prefs);
                             if (oldPasswordUserInput.equals(savedPassValueDecrypted)) {
-                                Cipher newCipher = new Cipher(cipherInitialVector);
+                                CipherOld newCipher = new CipherOld(cipherInitialVector);
                                 String encryptedPassword = newCipher.encryptString(setPass2Value,prefs);
 
                                 String encryptedOldText = prefs.getString(SharedConstants.NOTE, null);

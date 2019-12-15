@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.an.biometric.BiometricCallback;
-import com.an.biometric.BiometricManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -14,33 +13,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.preference.PreferenceManager;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
-import android.security.keystore.KeyProtection;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Enumeration;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -95,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                     password = findViewById(R.id.passphrase);
                     String passValue = password.getText().toString();
                     String savedPassValue = prefs.getString(SharedConstants.PASSWORD, null);
-                    Cipher cipher = new Cipher(
+                    CipherOld cipher = new CipherOld(
                             prefs.getString(SharedConstants.INITIAL_VECTOR, null));
                     String savedPassValueDecrypted = cipher.decryptString(savedPassValue, prefs);
                     if (passValue.equals(savedPassValueDecrypted)) {
@@ -145,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 //            KeyStore ks = KeyStore.getInstance("AndroidKeyStore");
 //            ks.load(null);
 //            Enumeration<String> aliases = ks.aliases();
-//            Cipher cipher = new Cipher(
+//            CipherOld cipher = new CipherOld(
 //                    prefs.getString(SharedConstants.SALT, null),
 //                    prefs.getString(SharedConstants.INITIAL_VECTOR, null),
 //                    "123");
