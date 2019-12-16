@@ -32,8 +32,6 @@ public class AndroidKeyStoreCipher implements Cipher {
             javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_TYPE);
             cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKeyProvider.get(SECRET));
             iv = cipher.getIV();
-            //prefs.edit().putString(SharedConstants.INITIAL_VECTOR, Base64.getEncoder().encodeToString(iv)).apply();//TODO: trzeba zapisywać iv osovbno dla pass i notatki
-
             byte[] utfMessageBytes = message.getBytes(StandardCharsets.UTF_8);
             byte[] cipherText = cipher.doFinal(utfMessageBytes);
             return Base64.getEncoder().encodeToString(cipherText);
@@ -48,7 +46,6 @@ public class AndroidKeyStoreCipher implements Cipher {
     public String decrypt(String encryptedMessage) throws CipherException {
         try {
             javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_TYPE);
-            //String iv = prefs.getString(SharedConstants.INITIAL_VECTOR, null);
             GCMParameterSpec ivSpec =
                     new GCMParameterSpec(128, iv);//TODO: co to tLen???
             cipher.init(javax.crypto.Cipher.DECRYPT_MODE, secretKeyProvider.get(SECRET), ivSpec);
