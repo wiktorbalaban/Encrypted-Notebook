@@ -9,10 +9,16 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.encryptednotebook.CipherFacade.AndroidKeyStoreEncryptionCipherFacade;
+import com.example.encryptednotebook.CipherFacade.CipherFacadeException;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 public class NotebookActivity extends AppCompatActivity {
+
+    EditText mText;
+    SharedPreferences mPrefs;
+    AndroidKeyStoreEncryptionCipherFacade mCipherFacade;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,51 +26,47 @@ public class NotebookActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notebook);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final EditText text = findViewById(R.id.text);
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        final String password = getIntent().getStringExtra(IntentConstants.DECRYPTED_PASS);
-        if (password != null) {
-            try {
-                CipherOld cipher = new CipherOld(
-                        prefs.getString(SharedConstants.INITIAL_VECTOR, null));
-                String encryptedText = prefs.getString(SharedConstants.NOTE, null);
-                if (encryptedText != null) {
-                    String noteText = cipher.decryptString(encryptedText,prefs);
-                    text.setText(noteText);
-                } else {
-                    text.setText(R.string.your_note);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        mText = findViewById(R.id.text);
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mCipherFacade = new AndroidKeyStoreEncryptionCipherFacade(mPrefs);
 
+        decryptNote();
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String noteToSave = text.getText().toString();
-
-                if (password != null) {
-                    try {
-                        CipherOld cipher = new CipherOld(
-                                prefs.getString(SharedConstants.INITIAL_VECTOR, null));
-                        String encryptedText = cipher.encryptString(noteToSave,prefs);
-                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putString(SharedConstants.NOTE, encryptedText).apply();
-
-                        Snackbar.make(view, getString(R.string.saved_successfully), Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Snackbar.make(view, getString(R.string.saved_failed), Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-                }
-            }
-        });
+        fab.setOnClickListener(mFabOnClickListener);
     }
 
+    View.OnClickListener mFabOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            String noteToSave = mText.getText().toString();
+            try {
+                String encryptedText = mCipherFacade.encrypt(noteToSave, SharedConstants.NOTE);
+                mPrefs.edit().putString(SharedConstants.NOTE, encryptedText).apply();
+
+                Snackbar.make(view, getString(R.string.saved_successfully), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            } catch (CipherFacadeException e) {
+                e.printStackTrace();
+                Snackbar.make(view, getString(R.string.saved_failed), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        }
+    };
+
+    void decryptNote() {
+        try {
+            String encryptedText = mPrefs.getString(SharedConstants.NOTE, null);
+            if (encryptedText != null) {
+                String noteText = mCipherFacade.decrypt(encryptedText, SharedConstants.NOTE);
+                mText.setText(noteText);
+            } else {
+                mText.setText(R.string.your_note);
+            }
+        } catch (CipherFacadeException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
