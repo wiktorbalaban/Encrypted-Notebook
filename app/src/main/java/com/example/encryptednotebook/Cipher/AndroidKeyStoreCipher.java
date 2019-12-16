@@ -50,7 +50,7 @@ public class AndroidKeyStoreCipher implements Cipher {
             javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_TYPE);
             //String iv = prefs.getString(SharedConstants.INITIAL_VECTOR, null);
             GCMParameterSpec ivSpec =
-                    new GCMParameterSpec(128, Base64.getDecoder().decode(iv));//TODO: co to tLen???
+                    new GCMParameterSpec(128, iv);//TODO: co to tLen???
             cipher.init(javax.crypto.Cipher.DECRYPT_MODE, secretKeyProvider.get(SECRET), ivSpec);
             byte[] messageBytes = Base64.getDecoder().decode(encryptedMessage);
             byte[] decryptedBytes = cipher.doFinal(messageBytes);

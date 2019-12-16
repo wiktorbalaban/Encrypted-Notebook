@@ -1,7 +1,7 @@
 package com.example.encryptednotebook.InitialVector;
 
 public interface InitialVectorProxy {
-    byte[] get(String key);
+    byte[] load(String key);
 
-    void set(byte[] iv, String key);
+    void save(byte[] iv, String key);
 }
