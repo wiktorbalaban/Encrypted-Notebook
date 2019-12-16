@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.example.encryptednotebook.CipherFacade.AndroidKeyStoreEncryptionCipherFacade;
 import com.example.encryptednotebook.CipherFacade.CipherFacadeException;
+import com.example.encryptednotebook.CipherFacade.RandomizedEncryptionCipherFacade;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -29,7 +30,9 @@ public class NotebookActivity extends AppCompatActivity {
 
         mText = findViewById(R.id.text);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mCipherFacade = new AndroidKeyStoreEncryptionCipherFacade(mPrefs);
+        mCipherFacade = new AndroidKeyStoreEncryptionCipherFacade(mPrefs, this);
+        mCipherFacade.setDecryptFinishEventListener(decryptFinishEventListener);
+        mCipherFacade.setEncryptFinishEventListener(encryptFinishEventListener);
 
         decryptNote();
 
@@ -42,8 +45,7 @@ public class NotebookActivity extends AppCompatActivity {
         public void onClick(View view) {
             String noteToSave = mText.getText().toString();
             try {
-                String encryptedText = mCipherFacade.encrypt(noteToSave, SharedConstants.NOTE);
-                mPrefs.edit().putString(SharedConstants.NOTE, encryptedText).apply();
+                mCipherFacade.encrypt(noteToSave, SharedConstants.NOTE);
 
                 Snackbar.make(view, getString(R.string.saved_successfully), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
@@ -59,8 +61,7 @@ public class NotebookActivity extends AppCompatActivity {
         try {
             String encryptedText = mPrefs.getString(SharedConstants.NOTE, null);
             if (encryptedText != null) {
-                String noteText = mCipherFacade.decrypt(encryptedText, SharedConstants.NOTE);
-                mText.setText(noteText);
+                mCipherFacade.decrypt(encryptedText, SharedConstants.NOTE);
             } else {
                 mText.setText(R.string.your_note);
             }
@@ -69,4 +70,19 @@ public class NotebookActivity extends AppCompatActivity {
         }
     }
 
+    RandomizedEncryptionCipherFacade.DecryptFinishEventListener decryptFinishEventListener =
+            new RandomizedEncryptionCipherFacade.DecryptFinishEventListener() {
+                @Override
+                public void onDecryptFinishEvent(String decryptedMessage) {
+                    mText.setText(decryptedMessage);
+                }
+            };
+
+    RandomizedEncryptionCipherFacade.EncryptFinishEventListener encryptFinishEventListener =
+            new RandomizedEncryptionCipherFacade.EncryptFinishEventListener() {
+                @Override
+                public void onEncryptFinishEvent(String encryptedMessage) {
+                    mPrefs.edit().putString(SharedConstants.NOTE, encryptedMessage).apply();
+                }
+            };
 }

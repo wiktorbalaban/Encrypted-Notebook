@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import com.an.biometric.BiometricCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -203,93 +202,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    BiometricCallback biometricCallback = new BiometricCallback() {
-        @Override
-        public void onSdkVersionNotSupported() {
-            /*
-             *  Will be called if the device sdk version does not support Biometric authentication
-             */
-            Toast.makeText(getApplicationContext(), "the device sdk version does not support Biometric authentication", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onBiometricAuthenticationNotSupported() {
-            /*
-             *  Will be called if the device does not contain any fingerprint sensors
-             */
-            Toast.makeText(getApplicationContext(), "the device does not contain any fingerprint sensors", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onBiometricAuthenticationNotAvailable() {
-            /*
-             *  The device does not have any biometrics registered in the device.
-             */
-            Toast.makeText(getApplicationContext(), "The device does not have any biometrics registered in the device.", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onBiometricAuthenticationPermissionNotGranted() {
-            /*
-             *  android.permission.USE_BIOMETRIC permission is not granted to the app
-             */
-            Toast.makeText(getApplicationContext(), "android.permission.USE_BIOMETRIC permission is not granted to the app", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onBiometricAuthenticationInternalError(String error) {
-            /*
-             *  This method is called if one of the fields such as the title, subtitle,
-             * description or the negative button text is empty
-             */
-            Toast.makeText(getApplicationContext(), "This method is called if one of the fields such as the title, subtitle, description or the negative button text is empty", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onAuthenticationFailed() {
-            /*
-             * When the fingerprint doesn’t match with any of the fingerprints registered on the device,
-             * then this callback will be triggered.
-             */
-            Toast.makeText(getApplicationContext(), "the fingerprint doesn’t match with any of the fingerprints registered on the device", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onAuthenticationCancelled() {
-            /*
-             * The authentication is cancelled by the user.
-             */
-            Toast.makeText(getApplicationContext(), "The authentication is cancelled by the user.", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onAuthenticationSuccessful() {
-            /*
-             * When the fingerprint is has been successfully matched with one of the fingerprints
-             * registered on the device, then this callback will be triggered.
-             */
-            Toast.makeText(getApplicationContext(), "the fingerprint has been successfully matched with one of the fingerprints registered on the device", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onAuthenticationHelp(int helpCode, CharSequence helpString) {
-            /*
-             * This method is called when a non-fatal error has occurred during the authentication
-             * process. The callback will be provided with an help code to identify the cause of the
-             * error, along with a help message.
-             */
-            Toast.makeText(getApplicationContext(), "a non-fatal error has occurred during the authentication process", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onAuthenticationError(int errorCode, CharSequence errString) {
-            /*
-             * When an unrecoverable error has been encountered and the authentication process has
-             * completed without success, then this callback will be triggered. The callback is provided
-             * with an error code to identify the cause of the error, along with the error message.
-             */
-            Toast.makeText(getApplicationContext(), "an unrecoverable error has been encountered: " + errString, Toast.LENGTH_SHORT).show();
-        }
-    };
 }
