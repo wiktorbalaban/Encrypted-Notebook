@@ -63,7 +63,7 @@ class CipherOld {
                 keyStore.getEntry("MyKeyAlias", null);
         SecretKey secretKey = secretKeyEntry.getSecretKey();
         javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_TYPE);
-        GCMParameterSpec ivSpec = new GCMParameterSpec(96, initialVector.getBytes(StandardCharsets.UTF_8));
+        //GCMParameterSpec ivSpec = new GCMParameterSpec(96, initialVector.getBytes(StandardCharsets.UTF_8));
         cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, secretKey);
         byte[] iv= cipher.getIV();
         prefs.edit().putString(SharedConstants.INITIAL_VECTOR, Base64.getEncoder().encodeToString(iv)).apply();//TODO: trzeba zapisywać iv osovbno dla pass i notatki
