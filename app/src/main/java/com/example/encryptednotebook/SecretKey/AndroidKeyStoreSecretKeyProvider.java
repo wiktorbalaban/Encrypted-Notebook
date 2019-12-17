@@ -29,7 +29,7 @@ public class AndroidKeyStoreSecretKeyProvider implements SecretKeyProvider {
                         KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                         .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
                         .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                        //.setUserAuthenticationRequired(true) // 2 requires lock screen, invalidated if lock screen is disabled
+                        .setUserAuthenticationRequired(true) // 2 requires lock screen, invalidated if lock screen is disabled
                         .setUserAuthenticationValidityDurationSeconds(-1) // 3 only available x seconds from password authentication. -1 requires finger print - every time
                         .setRandomizedEncryptionRequired(true) // 4 different ciphertext for same plaintext on each call
                         .build();

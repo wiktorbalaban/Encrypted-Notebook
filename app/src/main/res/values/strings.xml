@@ -19,4 +19,7 @@
     <string name="different_passphrases_message">Passphrases do not match, enter the same passphrases</string>
     <string name="unlock_note">Unlock note</string>
     <string name="cancel">Cancel</string>
+    <string name="auth">Auth</string>
+    <string name="authorize_yourself">Authorize yourself</string>
+    <string name="explain_auth">Authorize yourself to read note</string>
 </resources>

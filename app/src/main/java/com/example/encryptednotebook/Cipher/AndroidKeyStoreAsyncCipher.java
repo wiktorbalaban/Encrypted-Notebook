@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.biometric.BiometricPrompt;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.encryptednotebook.R;
 import com.example.encryptednotebook.SecretKey.SecretKeyException;
 import com.example.encryptednotebook.SecretKey.SecretKeyProvider;
 
@@ -39,17 +40,17 @@ public class AndroidKeyStoreAsyncCipher implements AsyncCipher {
         this.secretKeyProvider = secretKeyProvider;
         this.activity = activity;
         promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Prompt Title") // required
-                .setSubtitle("Prompt Subtitle")
-                .setDescription("Prompt Description: lorem ipsum")
-                .setNegativeButtonText("Cancel") // required
+                .setTitle(activity.getString(R.string.auth)) // required
+                .setSubtitle(activity.getString(R.string.authorize_yourself))
+                .setDescription(activity.getString(R.string.explain_auth))
+                .setNegativeButtonText(activity.getString(R.string.cancel)) // required
                 .build();
     }
 
     @Override
     public void encrypt(String message) throws CipherException {
         try {
-            decryptedMessage=message;
+            decryptedMessage = message;
             Cipher cipher = Cipher.getInstance(CIPHER_TYPE);
             SecretKey secretKey = secretKeyProvider.get(SECRET);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
@@ -66,7 +67,7 @@ public class AndroidKeyStoreAsyncCipher implements AsyncCipher {
     @Override
     public void decrypt(String encryptedMessage) throws CipherException {
         try {
-            this.encryptedMessage=encryptedMessage;
+            this.encryptedMessage = encryptedMessage;
             Cipher cipher = Cipher.getInstance(CIPHER_TYPE);
             GCMParameterSpec ivSpec =
                     new GCMParameterSpec(128, iv);//TODO: co to tLen???
@@ -104,12 +105,12 @@ public class AndroidKeyStoreAsyncCipher implements AsyncCipher {
         public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
             super.onAuthenticationSucceeded(result);
             try {
-            Cipher cipher = result.getCryptoObject().getCipher();
-            byte[] messageBytes = Base64.getDecoder().decode(encryptedMessage);
-            byte[] decryptedBytes = cipher.doFinal(messageBytes);
-            String decryptedMesage =  new String(decryptedBytes, StandardCharsets.UTF_8);
-            if (decryptFinishEventListener != null)
-                decryptFinishEventListener.onDecryptFinishEvent(decryptedMesage);
+                Cipher cipher = result.getCryptoObject().getCipher();
+                byte[] messageBytes = Base64.getDecoder().decode(encryptedMessage);
+                byte[] decryptedBytes = cipher.doFinal(messageBytes);
+                String decryptedMessage = new String(decryptedBytes, StandardCharsets.UTF_8);
+                if (decryptFinishEventListener != null)
+                    decryptFinishEventListener.onDecryptFinishEvent(decryptedMessage);
             } catch (BadPaddingException | IllegalBlockSizeException e) {
                 e.printStackTrace();
                 if (decryptFinishEventListener != null)
@@ -124,15 +125,16 @@ public class AndroidKeyStoreAsyncCipher implements AsyncCipher {
             super.onAuthenticationSucceeded(result);
             try {
                 Cipher cipher = result.getCryptoObject().getCipher();
+                byte[] iv = cipher.getIV();
                 byte[] utfMessageBytes = decryptedMessage.getBytes(StandardCharsets.UTF_8);
                 byte[] cipherText = cipher.doFinal(utfMessageBytes);
                 String encryptedMesage = Base64.getEncoder().encodeToString(cipherText);
                 if (encryptFinishEventListener != null)
-                    encryptFinishEventListener.onEncryptFinishEvent(encryptedMesage);
+                    encryptFinishEventListener.onEncryptFinishEvent(encryptedMesage, iv);
             } catch (BadPaddingException | IllegalBlockSizeException e) {
                 e.printStackTrace();
                 if (encryptFinishEventListener != null)
-                    encryptFinishEventListener.onEncryptFinishEvent("");
+                    encryptFinishEventListener.onEncryptFinishEvent("", new byte[1]);//TODO: on failed event
             }
         }
     };

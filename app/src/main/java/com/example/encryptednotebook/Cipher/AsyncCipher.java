@@ -10,10 +10,10 @@ public interface AsyncCipher {
     void setDecryptFinishEventListener(DecryptFinishEventListener decryptFinishEventListener);
 
     interface EncryptFinishEventListener {
-        void onEncryptFinishEvent (String encryptedMessage);
+        void onEncryptFinishEvent(String encryptedMessage, byte[] iv);
     }
 
     interface DecryptFinishEventListener {
-        void onDecryptFinishEvent (String decryptedMessage);
+        void onDecryptFinishEvent(String decryptedMessage);
     }
 }

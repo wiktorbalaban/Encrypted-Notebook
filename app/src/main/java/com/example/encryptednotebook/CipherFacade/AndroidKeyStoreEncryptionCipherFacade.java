@@ -14,8 +14,9 @@ public class AndroidKeyStoreEncryptionCipherFacade implements RandomizedEncrypti
 
     private AndroidKeyStoreAsyncCipher cipher;
     private SharedPreferencesInitialVector iv;
-    DecryptFinishEventListener decryptFinishEventListener;
-    EncryptFinishEventListener encryptFinishEventListener;
+    private DecryptFinishEventListener decryptFinishEventListener;
+    private EncryptFinishEventListener encryptFinishEventListener;
+    private String tmpKey;
 
     public AndroidKeyStoreEncryptionCipherFacade(SharedPreferences prefs, FragmentActivity activity) {
         AndroidKeyStoreSecretKeyProvider secretKeyProvider = new AndroidKeyStoreSecretKeyProvider();
@@ -29,7 +30,7 @@ public class AndroidKeyStoreEncryptionCipherFacade implements RandomizedEncrypti
     public void encrypt(String message, String key) throws CipherFacadeException {
         try {
             cipher.encrypt(message);
-            iv.save(cipher.getIv(), key);
+            tmpKey = key;
         } catch (CipherException e) {
             e.printStackTrace();
             throw new CipherFacadeException();
@@ -50,7 +51,7 @@ public class AndroidKeyStoreEncryptionCipherFacade implements RandomizedEncrypti
 
     @Override
     public void setEncryptFinishEventListener(EncryptFinishEventListener encryptFinishEventListener) {
-        this.encryptFinishEventListener=encryptFinishEventListener;
+        this.encryptFinishEventListener = encryptFinishEventListener;
     }
 
     @Override
@@ -58,7 +59,7 @@ public class AndroidKeyStoreEncryptionCipherFacade implements RandomizedEncrypti
         this.decryptFinishEventListener = decryptFinishEventListener;
     }
 
-    AsyncCipher.DecryptFinishEventListener decryptFinishEventListenerInFacade = new AsyncCipher.DecryptFinishEventListener() {
+    private AsyncCipher.DecryptFinishEventListener decryptFinishEventListenerInFacade = new AsyncCipher.DecryptFinishEventListener() {
         @Override
         public void onDecryptFinishEvent(String decryptedMessage) {
             if (decryptFinishEventListener != null)
@@ -66,9 +67,10 @@ public class AndroidKeyStoreEncryptionCipherFacade implements RandomizedEncrypti
         }
     };
 
-    AsyncCipher.EncryptFinishEventListener encryptFinishEventListenerInFacade = new AsyncCipher.EncryptFinishEventListener() {
+    private AsyncCipher.EncryptFinishEventListener encryptFinishEventListenerInFacade = new AsyncCipher.EncryptFinishEventListener() {
         @Override
-        public void onEncryptFinishEvent(String encryptedMessage) {
+        public void onEncryptFinishEvent(String encryptedMessage, byte[] iv1) {
+            iv.save(iv1, tmpKey);
             if (encryptFinishEventListener != null)
                 encryptFinishEventListener.onEncryptFinishEvent(encryptedMessage);
         }
